@@ -63,6 +63,13 @@
       font-weight: 800;
       letter-spacing: -0.02em;
     }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
   </style>
 </head>
 
@@ -128,7 +135,7 @@
           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-mint-50 hover:bg-mint-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 text-xs sm:text-sm font-bold transition active:scale-95"
           title="구글시트 데이터 새로고침"
         >
-          <i id="icon-refresh" data-lucide="refresh-cw" class="w-4 h-4"></i>
+          <span id="icon-refresh-wrap" class="inline-flex items-center"><i data-lucide="refresh-cw" class="w-4 h-4"></i></span>
           <span class="hidden sm:inline">새로고침</span>
         </button>
 
@@ -139,7 +146,7 @@
           class="inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-50 hover:bg-amber-100 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-slate-700 text-xs sm:text-sm font-bold transition active:scale-95"
           title="라이트/다크 모드 전환"
         >
-          <i id="icon-theme" data-lucide="moon" class="w-4 h-4"></i>
+          <span id="icon-theme-wrap" class="inline-flex items-center"><i data-lucide="moon" class="w-4 h-4"></i></span>
           <span id="label-theme" class="hidden sm:inline">다크모드</span>
         </button>
 
@@ -467,9 +474,9 @@
     async function loadAllSheetData(showFeedback = false) {
       const syncDot = document.getElementById('sync-dot');
       const syncText = document.getElementById('sync-text');
-      const refreshIcon = document.getElementById('icon-refresh');
+      const refreshWrap = document.getElementById('icon-refresh-wrap');
 
-      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+      if (refreshWrap) refreshWrap.classList.add('animate-spin');
       syncDot.className = 'w-2 h-2 rounded-full bg-amber-300 animate-pulse';
       syncText.textContent = '구글시트 동기화 중...';
 
@@ -538,7 +545,7 @@
           showToast('시트 연결을 확인해 주세요.', '⚠️');
         }
       } finally {
-        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+        if (refreshWrap) refreshWrap.classList.remove('animate-spin');
       }
     }
 
@@ -682,7 +689,7 @@
       ];
 
       return `
-        ${renderCategoryHeader('🌈', '연수 개요 & 시작 전 환경 점검', `${appState.settings.orgName}과 함께하는 자기 교과 맞춤형 AI·디지털 수업 역량 강화 연수입니다. 오늘 하루 동안 당장 내일 교실에서 쓸 나만의 수업 패키지를 완성해 보세요!`, 'from-brand-500 via-indigo-500 to-sky-500')}
+        ${renderCategoryHeader('🌈', '연수 개요 & 시작 전 환경 점검', `${escapeHtml(appState.settings.orgName)}과 함께하는 자기 교과 맞춤형 AI·디지털 수업 역량 강화 연수입니다. 오늘 하루 동안 당장 내일 교실에서 쓸 나만의 수업 패키지를 완성해 보세요!`, 'from-brand-500 via-indigo-500 to-sky-500')}
 
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
           <!-- 연수 목적 -->
@@ -833,22 +840,86 @@
     // --- [카테고리 4] 학습지 & 형성평가 ---
     function buildWorksheetHtml() {
       return `
-        ${renderCategoryHeader('📝', '수준별 학습지 & 자동 채점 형성평가 제작', '기초·심화 수준별 활동지와 성취기준 기반 채점 기준표(루브릭)를 만들고, Google Forms 자동 채점 퀴즈 완성 및 교과 오류 교차 점검까지 진행합니다.', 'from-emerald-500 to-teal-500')}
+        ${renderCategoryHeader('📝', '수준별 학습지 & 형성평가 퀴즈 자동 제작', '기초·심화 수준별 활동지와 채점 기준표(루브릭)를 만들고, ① 앱스 스크립트로 구글 폼즈 퀴즈 자동 생성하기와 ② 브리스크티칭(Brisk Teaching) 확장 프로그램으로 구글 폼즈 퀴즈 바로 만들기 두 가지 방법을 실습합니다.', 'from-emerald-500 to-teal-500')}
 
         <div class="space-y-5">
           ${renderPromptCard('STEP 1 · 학습지', '기초·심화 수준별 학습지 제작 (Docs 저장)', '앞선 [과목] 수업 설계안을 바탕으로, 학생들이 수업 시간에 작성할 A4 1장 분량의 학습지를 만들어 줘. [기초형: 핵심 용어 빈칸 채우기·선 잇기 중심]과 [심화형: 사례 분석·자기 생각 서술 중심] 두 버전으로 각각 작성해 줘. 상단에는 학번·이름 칸과 학습목표를 넣어줘.', '생성 후 [Google Docs로 내보내기] → 파일명: 02_[과목]_수준별학습지')}
 
-          ${renderPromptCard('STEP 2 · 평가', '성취기준 기반 루브릭 & 형성평가 5문항', '이 수업의 성취기준에 맞춰 수행평가 채점 기준표(상·중·하 3단계, 평가 요소 3가지)를 표로 작성해 줘. 이어서 수업 마무리용 4지 선다형 형성평가 5문항을 만들어 줘. (문항별 정답과 학생용 쉬운 해설 포함)', '아래 버튼으로 Google Forms를 열고 [설정 → 퀴즈로 만들기]를 켠 뒤 문항을 붙여넣어 보세요.')}
+          ${renderPromptCard('STEP 2 · 문항 생성', '성취기준 기반 루브릭 & 형성평가 5문항 만들기', '이 수업의 성취기준에 맞춰 수행평가 채점 기준표(상·중·하 3단계, 평가 요소 3가지)를 표로 작성해 줘. 이어서 수업 마무리용 4지 선다형 형성평가 5문항을 만들어 줘. (문항별 정답과 학생용 쉬운 해설 포함)', '먼저 제미나이와의 대화로 5문항을 완성한 뒤, 아래 두 가지 방법(앱스 스크립트 vs 브리스크티칭)을 차례로 실습해 보세요.')}
 
-          <div class="rounded-3xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 p-5 flex flex-wrap items-center justify-between gap-4">
-            <div class="text-sm text-emerald-800 dark:text-emerald-200 space-y-1">
-              <p class="font-display text-lg">⚡ Google Forms 자동 채점 퀴즈 3단계</p>
-              <p>① 새 설문지 생성 (03_[과목]_형성평가) → ② 상단 <strong>[설정] → [퀴즈로 만들기] ON</strong> → ③ 문항 붙여넣기 후 <strong>[답안]</strong>에서 정답·배점 지정</p>
+          <!-- 퀴즈 제작 2가지 실습 (실습 1: 앱스 스크립트 자동 생성 / 실습 2: 브리스크티칭) -->
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
+            <!-- 실습 1: 앱스 스크립트 코드로 구글 폼즈 자동 생성 -->
+            <div class="rounded-3xl bg-emerald-50/70 dark:bg-emerald-950/20 border-2 border-emerald-200 dark:border-emerald-800/60 p-5 flex flex-col justify-between gap-4">
+              <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="font-display text-xl text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
+                    <span>⚡</span> 실습 1. 앱스 스크립트로 퀴즈 자동 생성
+                  </h3>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-900/70 text-emerald-700 dark:text-emerald-200">복사·실행 · 일괄 생성</span>
+                </div>
+
+                ${renderPromptCard('자동 생성 프롬프트', '구글 폼즈 퀴즈를 한 번에 만들어 주는 코드 요청', '방금 만든 객관식 5문항을 내 구글 설문지(Google Forms)에 자동으로 만들어 주는 구글 앱스 스크립트(Apps Script) 코드를 작성해 줘. 설문지 제목은 "[과목]_[수업주제]_형성평가"로 하고, 자동 채점(퀴즈) 모드를 켜서 각 문항당 20점, 정답, 정답/오답 해설까지 모두 자동으로 들어가게 만들어 줘. 초보자도 그대로 복사해서 실행할 수 있게 오류 없이 완성해 줘.', '제미나이가 만들어 준 코드를 그대로 복사해 아래 [자동 만들기 창]에 붙여넣고 실행만 누르면 끝납니다!')}
+
+                <div class="rounded-2xl bg-white/90 dark:bg-slate-900/80 border border-emerald-100 dark:border-slate-800 p-4 text-xs sm:text-sm text-slate-700 dark:text-slate-200 space-y-2.5">
+                  <p class="font-bold text-emerald-700 dark:text-emerald-300">📌 초급자 따라하기 4단계</p>
+                  <ol class="list-decimal list-inside space-y-1.5 leading-relaxed">
+                    <li><strong>자동 만들기 창 열기:</strong> 아래 <strong>[자동 만들기 창]</strong> 버튼(<code class="px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 font-bold">script.new</code>)을 클릭합니다.</li>
+                    <li><strong>코드 붙여넣기:</strong> 화면에 원래 적혀 있는 기본 글자를 모두 지우고, 제미나이가 만들어 준 코드를 붙여넣은 뒤 상단 <strong>💾 저장</strong>을 누릅니다.</li>
+                    <li><strong>실행 및 권한 허용:</strong> 상단 <strong>▶ 실행</strong>을 클릭합니다. 처음 한 번만 뜨는 권한 확인 창에서 <strong>[권한 검토 → 본인 계정 → 고급 → 안전하지 않음(이동) → 허용]</strong>을 누릅니다.</li>
+                    <li><strong>자동 생성 확인:</strong> 실행이 완료되면 아래 <strong>[생성된 퀴즈 확인]</strong> 버튼을 눌러 내 구글 설문지 목록에 방금 자동 생성된 퀴즈를 확인합니다!</li>
+                  </ol>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <a href="https://script.new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition active:scale-95">
+                  <i data-lucide="code-2" class="w-4 h-4"></i>
+                  자동 만들기 창
+                </a>
+                <a href="https://docs.google.com/forms" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-white hover:bg-emerald-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700 font-bold text-sm shadow-sm transition active:scale-95">
+                  <i data-lucide="file-check" class="w-4 h-4"></i>
+                  생성된 퀴즈 확인
+                </a>
+              </div>
             </div>
-            <a href="https://forms.new" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-sm transition active:scale-95">
-              <i data-lucide="plus-circle" class="w-4 h-4"></i>
-              새 Google Forms 바로 만들기
-            </a>
+
+            <!-- 실습 2: 브리스크티칭(Brisk Teaching)으로 구글 폼즈 퀴즈 바로 만들기 -->
+            <div class="rounded-3xl bg-teal-50/70 dark:bg-teal-950/20 border-2 border-teal-200 dark:border-teal-800/60 p-5 flex flex-col justify-between gap-4">
+              <div class="space-y-4">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h3 class="font-display text-xl text-teal-700 dark:text-teal-300 flex items-center gap-2">
+                    <span>🐝</span> 실습 2. 브리스크티칭으로 퀴즈 바로 만들기
+                  </h3>
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-teal-100 dark:bg-teal-900/70 text-teal-700 dark:text-teal-200">코드 없음 · 원클릭 생성</span>
+                </div>
+
+                ${renderPromptCard('브리스크 요청 문구', '퀴즈 생성 창에 입력할 맞춤 지시문 (선택)', '현재 보고 있는 문서(또는 웹페이지/영상)의 핵심 내용을 바탕으로 [학교급/학년] 학생 수준에 맞는 4지 선다형 형성평가 5문항을 한국어로 만들어 줘. 정답과 간단한 해설을 함께 넣어줘.', '브리스크티칭은 보고 있는 구글 문서, 웹 기사, 유튜브 영상에서 바로 퀴즈를 뽑아 구글 폼즈로 만들어 줍니다!')}
+
+                <div class="rounded-2xl bg-white/90 dark:bg-slate-900/80 border border-teal-100 dark:border-slate-800 p-4 text-xs sm:text-sm text-slate-700 dark:text-slate-200 space-y-2.5">
+                  <p class="font-bold text-teal-700 dark:text-teal-300">📌 브리스크티칭 초급자 따라하기 5단계</p>
+                  <ol class="list-decimal list-inside space-y-1.5 leading-relaxed">
+                    <li><strong>확장 프로그램 설치:</strong> 아래 버튼으로 크롬 웹스토어에서 <strong>Brisk Teaching</strong>을 [Chrome에 추가]하고 구글 계정으로 로그인합니다.</li>
+                    <li><strong>기준 자료 열기:</strong> 앞서 만든 <strong>Google Docs(수업설계안·학습지)</strong>나 수업 관련 <strong>웹 기사·유튜브 영상</strong> 화면을 엽니다.</li>
+                    <li><strong>브리스크 실행:</strong> 화면 오른쪽 아래에 뜬 동그란 <strong>Brisk 아이콘(B)</strong>을 클릭한 뒤 <strong>[Create(만들기) → Quiz(퀴즈)]</strong>를 선택합니다.</li>
+                    <li><strong>옵션 설정:</strong> 형식은 <strong>[Google Form]</strong>, 언어는 <strong>[한국어(Korean)]</strong>, 문항 수(5문항)·객관식·학년 수준을 고르고 위 지시문을 붙여넣습니다.</li>
+                    <li><strong>자동 완성:</strong> <strong>[Brisk It!]</strong> 버튼을 누르면 몇 초 만에 정답과 자동 채점이 설정된 <strong>구글 설문지 퀴즈</strong>가 내 드라이브에 자동 생성됩니다!</li>
+                  </ol>
+                  <p class="text-xs text-teal-600 dark:text-teal-400 pt-1">💡 <strong>꿀팁:</strong> 제미나이로 미리 만든 5문항을 Google Docs에 붙여넣고 Brisk를 실행하면, 그 문항 그대로 구글 폼즈로 변환할 수도 있습니다.</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2">
+                <a href="https://chromewebstore.google.com/detail/brisk-teaching-ai-that-wo/pcblbflgdkdfdjpjifeppkljdnaekohj?hl=ko" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-sm shadow-sm transition active:scale-95">
+                  <i data-lucide="puzzle" class="w-4 h-4"></i>
+                  크롬 확장 설치
+                </a>
+                <a href="https://www.briskteaching.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-2xl bg-white hover:bg-teal-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 font-bold text-sm shadow-sm transition active:scale-95">
+                  <i data-lucide="external-link" class="w-4 h-4"></i>
+                  브리스크 공식 홈
+                </a>
+              </div>
+            </div>
           </div>
 
           ${renderPromptCard('STEP 3 · 오류 점검', '교과 전문가의 눈 + AI 교차 검증', '방금 만든 형성평가 5문항을 깐깐한 출제 검토 위원 입장에서 점검해 줘. 1) 복수 정답 소지가 있는 문항, 2) [학교급/학년] 수준에 비해 어휘가 너무 어려운 부분, 3) 사실관계나 교과 개념 오류가 있는 부분을 찾아 수정안을 제시해 줘.', '교사의 교과 전문성으로 최종 검토하는 과정이 가장 중요합니다!')}
@@ -1322,9 +1393,11 @@
 
     function updateThemeButton() {
       const isDark = document.documentElement.classList.contains('dark');
-      const iconEl = document.getElementById('icon-theme');
+      const iconWrap = document.getElementById('icon-theme-wrap');
       const labelEl = document.getElementById('label-theme');
-      if (iconEl) iconEl.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+      if (iconWrap) {
+        iconWrap.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}" class="w-4 h-4"></i>`;
+      }
       if (labelEl) labelEl.textContent = isDark ? '라이트모드' : '다크모드';
       if (window.lucide) lucide.createIcons();
     }
